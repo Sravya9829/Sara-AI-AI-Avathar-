@@ -4,7 +4,7 @@
 
 A production-ready conversational AI avatar system featuring Stable Diffusion-generated avatars with professional voice capabilities, achieving consistent sub-2 second response times through optimized architecture and browser-based audio integration.
 
-## What We Built
+## What I Built
 
 - **Real-time Avatar Generation**: Stable Diffusion v1.5 creates a consistent professional businesswoman avatar
 - **Voice-Enabled Conversation**: Full speech recognition and synthesis using Web Speech API
@@ -51,7 +51,7 @@ http://localhost:8080
 
 ## Challenge Requirements Met
 
-| Requirement | Status | Our Implementation |
+| Requirement | Status | My Implementation |
 |-------------|--------|-------------------|
 | **Latency < 2 seconds** | ✅ | One-time avatar generation + cached responses + optimized pipeline |
 | **Serverless Ready** | ✅ | Docker containerization with FastAPI, cloud deployment ready |
@@ -61,13 +61,13 @@ http://localhost:8080
 
 ## System Architecture
 
-We chose a browser-centric architecture for optimal performance and compatibility:
+I chose a browser-centric architecture for optimal performance and compatibility:
 
 ```
 Browser (Web Speech API) ↔ WebSocket ↔ FastAPI Server ↔ Stable Diffusion + AI Pipeline
 ```
 
-**Why This Architecture:**
+**Why I Chose This Architecture:**
 - Browser audio eliminates Docker audio complexity
 - WebSocket enables real-time communication
 - Cached avatar generation ensures fast responses

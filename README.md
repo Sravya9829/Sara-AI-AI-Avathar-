@@ -16,6 +16,7 @@ A production-ready conversational AI avatar system featuring Stable Diffusion-ge
 - **Local System**: Run `python main.py` and open http://localhost:8080
 - **Docker Container**: Use `docker run -p 8080:8080 sarah-ai-avatar` for containerized deployment
 - **Features**: Voice recognition, natural text-to-speech, realistic lip sync, professional sales consultation
+- Also Demo.mp4 is present where you can see how it works
 
 ## Quick Start
 

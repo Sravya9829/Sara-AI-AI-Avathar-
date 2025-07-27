@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarah AI - Professional Assistant</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container { 
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            height: 100vh;
+            gap: 0;
+        }
+        
+        /* Left side - Avatar section */
+        .avatar-section { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%);
+        }
+        
+        .avatar-container { 
+            position: relative;
+            width: 500px;
+            height: 500px;
+            margin-bottom: 2rem;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #1f1f1f, #0a0a0a);
+            padding: 8px;
+            box-shadow: 
+                0 30px 80px rgba(0,0,0,0.9),
+                0 0 120px rgba(255,255,255,0.05),
+                inset 0 2px 0 rgba(255,255,255,0.1);
+            transition: all 0.4s ease;
+        }
+        
+        .avatar-container:hover {
+            transform: translateY(-10px);
+            box-shadow: 
+                0 40px 100px rgba(0,0,0,0.95),
+                0 0 150px rgba(255,255,255,0.08),
+                inset 0 2px 0 rgba(255,255,255,0.15);
+        }
+        
+        .avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #fff;
+            position: relative;
+            border: 3px solid rgba(255,255,255,0.1);
+        }
+        
+        .avatar { 
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+        
+        /* Enhanced Lip Sync Animation */
+        .lip-sync {
+            position: absolute;
+            bottom: 32%;
+            left: 46%;
+            width: 8%;
+            height: 4%;
+            background: rgba(200, 120, 140, 0.7);
+            border-radius: 50%;
+            opacity: 0;
+            transform: scaleY(0.8) scaleX(1.2);
+            transition: all 0.15s ease-in-out;
+            z-index: 10;
+        }
+        
+        /* Speaking animation */
+        .avatar-container.speaking .lip-sync {
+            animation: natural-lip-movement 0.4s ease-in-out infinite alternate;
+        }
+        
+        .avatar-container.speaking .avatar {
+            filter: brightness(1.1) contrast(1.05);
+        }
+        
+        @keyframes natural-lip-movement {
+            0% { 
+                opacity: 0.4; 
+                transform: scaleY(0.7) scaleX(1.1);
+                background: rgba(200, 120, 140, 0.5);
+            }
+            50% { 
+                opacity: 0.9; 
+                transform: scaleY(1.4) scaleX(1.5);
+                background: rgba(160, 80, 100, 0.8);
+            }
+            100% { 
+                opacity: 0.5; 
+                transform: scaleY(0.9) scaleX(1.2);
+                background: rgba(200, 120, 140, 0.6);
+            }
+        }
+        
+        /* Idle breathing animation */
+        .avatar-container.idle .avatar {
+            animation: subtle-breathing 6s ease-in-out infinite;
+        }
+        
+        @keyframes subtle-breathing {
+            0%, 100% { transform: scale(1.0); }
+            50% { transform: scale(1.015); }
+        }
+        
+        .status { 
+            text-align: center;
+            font-size: 1.2rem;
+            color: #e0e0e0;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            padding: 1.2rem 2.5rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.15);
+            max-width: 400px;
+            font-weight: 500;
+        }
+        
+        /* Audio indicator */
+        .audio-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            background: rgba(0, 255, 0, 0.8);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .audio-indicator.show {
+            opacity: 1;
+        }
+        
+        /* Right side - Chat section */
+        .chat-section { 
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header { 
+            padding: 2rem 2rem 1rem 2rem;
+            text-align: center;
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+        
+        .chat-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+        
+        .chat-header p {
+            color: #aaa;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+        
+        .chat-messages { 
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            min-height: 0;
+        }
+        
+        .message { 
+            padding: 1.2rem 1.5rem;
+            border-radius: 16px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            animation: slideIn 0.4s ease;
+            word-wrap: break-word;
+            font-weight: 400;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message { 
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-left: 3rem;
+            text-align: right;
+            border-bottom-right-radius: 6px;
+        }
+        
+        .assistant-message { 
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-right: 3rem;
+            border-bottom-left-radius: 6px;
+        }
+        
+        .controls { 
+            padding: 2rem;
+            background: rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            gap: 1rem;
+            align-items: stretch;
+            flex-shrink: 0;
+        }
+        
+        .mic-button { 
+            flex: 0 0 100px;
+            background: linear-gradient(135deg, #000, #1a1a1a);
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .mic-button:hover { 
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255,255,255,0.1);
+        }
+        
+        .mic-button.recording { 
+            background: linear-gradient(135deg, #ff4444, #ff6666);
+            color: #fff;
+            animation: recording-pulse 2s infinite;
+        }
+        
+        @keyframes recording-pulse { 
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,68,68,0.7); } 
+            50% { box-shadow: 0 0 0 15px rgba(255,68,68,0); } 
+        }
+        
+        .mic-icon {
+            font-size: 1.4rem;
+        }
+        
+        .mic-text {
+            font-size: 0.7rem;
+        }
+        
+        .text-input { 
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            padding: 1.2rem;
+            font-family: inherit;
+            min-width: 0;
+            font-weight: 400;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        
+        .text-input::placeholder {
+            color: #888;
+        }
+        
+        .send-button { 
+            flex: 0 0 80px;
+            background: linear-gradient(135deg, #fff, #e0e0e0);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .send-button:hover { 
+            background: linear-gradient(135deg, #f0f0f0, #d0d0d0);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255,255,255,0.1);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1400px) {
+            .container {
+                grid-template-columns: 1fr 400px;
+            }
+            
+            .avatar-container {
+                width: 400px;
+                height: 400px;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+            
+            .avatar-section {
+                padding: 2rem;
+            }
+            
+            .avatar-container {
+                width: 350px;
+                height: 350px;
+                margin-bottom: 1.5rem;
+            }
+            
+            .chat-section {
+                border-left: none;
+                border-top: 1px solid rgba(255,255,255,0.1);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .avatar-container {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .chat-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .controls {
+                padding: 1.5rem;
+            }
+            
+            .mic-button {
+                flex: 0 0 80px;
+            }
+            
+            .send-button {
+                flex: 0 0 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="avatar-section">
+            <div class="avatar-container idle" id="avatarContainer">
+                <div class="avatar-inner">
+                    <img id="avatar" class="avatar" src="" alt="Sarah AI">
+                    <div class="lip-sync" id="lipSync"></div>
+                    <div class="audio-indicator" id="audioIndicator">🔊 Speaking</div>
+                </div>
+            </div>
+            <div class="status" id="status">
+                <span class="loading"></span>
+                &nbsp;&nbsp;Initializing Sarah...
+            </div>
+        </div>
+        
+        <div class="chat-section">
+            <div class="chat-header">
+                <h1>SARAH AI</h1>
+                <p>Professional Sales Consultant with Voice</p>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant-message">
+                    👋 Hello! I'm Sarah, your professional AI assistant with perfect voice capabilities. I can understand speech and respond with natural audio. What would you like to discuss?
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="mic-button" id="micButton">
+                    <span class="mic-icon">🎙️</span>
+                    <span class="mic-text">Hold</span>
+                </button>
+                <input type="text" class="text-input" id="textInput" placeholder="Type your message or hold mic to speak...">
+                <button class="send-button" id="sendButton">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sarah AI Enhanced Audio System
+        class SarahAudioSystem {
+            constructor() {
+                this.synthesis = window.speechSynthesis;
+                this.recognition = null;
+                this.isListening = false;
+                this.isSpeaking = false;
+                this.voices = [];
+                this.selectedVoice = null;
+                
+                this.initializeAudio();
+            }
+            
+            async initializeAudio() {
+                console.log("🔊 Initializing Sarah AI audio system...");
+                
+                // Load voices
+                await this.loadVoices();
+                
+                // Setup speech recognition
+                this.setupSpeechRecognition();
+                
+                // Test audio system
+                setTimeout(() => {
+                    this.speak("Sarah AI voice system is ready and operational", true);
+                }, 2000);
+                
+                console.log("✅ Sarah AI audio system ready");
+            }
+            
+            async loadVoices() {
+                return new Promise((resolve) => {
+                    const loadVoicesHandler = () => {
+                        this.voices = this.synthesis.getVoices();
+                        
+                        if (this.voices.length > 0) {
+                            // Find best female voice
+                            this.selectedVoice = this.voices.find(voice => 
+                                voice.name.includes('Zira') || 
+                                voice.name.includes('Microsoft Zira') ||
+                                voice.name.includes('Female') ||
+                                voice.name.includes('Hazel') ||
+                                (voice.lang.startsWith('en') && voice.name.toLowerCase().includes('female'))
+                            ) || this.voices.find(voice => voice.lang.startsWith('en')) || this.voices[0];
+                            
+                            console.log(`✅ Selected voice: ${this.selectedVoice.name}`);
+                            resolve();
+                        }
+                    };
+                    
+                    loadVoicesHandler();
+                    this.synthesis.onvoiceschanged = loadVoicesHandler;
+                });
+            }
+            
+            setupSpeechRecognition() {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    this.recognition = new SpeechRecognition();
+                    
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = false;
+                    this.recognition.lang = 'en-US';
+                    
+                    this.recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        console.log(`🎤 Recognized: "${transcript}"`);
+                        this.onSpeechResult(transcript);
+                    };
+                    
+                    this.recognition.onerror = (event) => {
+                        console.error('Speech recognition error:', event.error);
+                        this.stopListening();
+                        this.updateStatus('❌ Speech recognition error');
+                    };
+                    
+                    this.recognition.onend = () => {
+                        this.stopListening();
+                    };
+                    
+                    console.log("✅ Speech recognition ready");
+                } else {
+                    console.warn("⚠️ Speech recognition not supported");
+                }
+            }
+            
+            speak(text, isSystemMessage = false) {
+                if (!this.synthesis || !text) return false;
+                
+                // Cancel any current speech
+                this.synthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = this.selectedVoice;
+                utterance.rate = 0.85;
+                utterance.pitch = 1.1;
+                utterance.volume = 0.9;
+                
+                utterance.onstart = () => {
+                    this.isSpeaking = true;
+                    console.log(`🔊 Sarah speaking: "${text.substring(0, 50)}..."`);
+                    this.startLipSync();
+                    this.showAudioIndicator();
+                    
+                    if (!isSystemMessage) {
+                        this.updateStatus('🗣️ Sarah is speaking...');
+                    }
+                };
+                
+                utterance.onend = () => {
+                    this.isSpeaking = false;
+                    console.log("✅ Sarah finished speaking");
+                    this.stopLipSync();
+                    this.hideAudioIndicator();
+                    
+                    if (!isSystemMessage) {
+                        this.updateStatus('🤖 Ready to chat!');
+                    }
+                };
+                
+                utterance.onerror = (event) => {
+                    console.error("Speech error:", event.error);
+                    this.isSpeaking = false;
+                    this.stopLipSync();
+                    this.hideAudioIndicator();
+                };
+                
+                this.synthesis.speak(utterance);
+                return true;
+            }
+            
+            startLipSync() {
+                const avatarContainer = document.getElementById('avatarContainer');
+                avatarContainer.classList.remove('idle');
+                avatarContainer.classList.add('speaking');
+            }
+            
+            stopLipSync() {
+                const avatarContainer = document.getElementById('avatarContainer');
+                avatarContainer.classList.remove('speaking');
+                avatarContainer.classList.add('idle');
+            }
+            
+            showAudioIndicator() {
+                const indicator = document.getElementById('audioIndicator');
+                indicator.classList.add('show');
+            }
+            
+            hideAudioIndicator() {
+                const indicator = document.getElementById('audioIndicator');
+                indicator.classList.remove('show');
+            }
+            
+            startListening() {
+                if (!this.recognition || this.isListening) return false;
+                
+                // Stop speech before listening
+                if (this.isSpeaking) {
+                    this.synthesis.cancel();
+                    this.stopLipSync();
+                    this.hideAudioIndicator();
+                }
+                
+                this.isListening = true;
+                this.updateMicButton(true);
+                this.updateStatus('🎤 Listening... speak now');
+                
+                try {
+                    this.recognition.start();
+                    return true;
+                } catch (error) {
+                    console.error("Failed to start listening:", error);
+                    this.stopListening();
+                    return false;
+                }
+            }
+            
+            stopListening() {
+                this.isListening = false;
+                this.updateMicButton(false);
+                
+                if (this.recognition) {
+                    try {
+                        this.recognition.stop();
+                    } catch (error) {
+                        console.warn("Error stopping recognition:", error);
+                    }
+                }
+            }
+            
+            updateMicButton(isListening) {
+                const micButton = document.getElementById('micButton');
+                if (micButton) {
+                    if (isListening) {
+                        micButton.classList.add('recording');
+                        micButton.innerHTML = '<span class="mic-icon">🔴</span><span class="mic-text">Rec</span>';
+                    } else {
+                        micButton.classList.remove('recording');
+                        micButton.innerHTML = '<span class="mic-icon">🎙️</span><span class="mic-text">Hold</span>';
+                    }
+                }
+            }
+            
+            updateStatus(message) {
+                const status = document.getElementById('status');
+                if (status) {
+                    status.textContent = message;
+                }
+            }
+            
+            onSpeechResult(transcript) {
+                if (window.sendMessage) {
+                    window.sendMessage(transcript);
+                }
+            }
+        }
+
+        // WebSocket and UI Management
+        let ws = null;
+        let sarahAudio = null;
+
+        function initWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+            
+            ws.onopen = () => {
+                console.log('✅ Connected to Sarah AI');
+                document.getElementById('status').textContent = '🤖 Sarah is ready!';
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleMessage(data);
+            };
+            
+            ws.onclose = () => {
+                console.log('❌ Disconnected');
+                document.getElementById('status').innerHTML = '<span class="loading"></span>&nbsp;&nbsp;Reconnecting...';
+                setTimeout(initWebSocket, 3000);
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+        }
+
+        function handleMessage(data) {
+            const avatar = document.getElementById('avatar');
+            
+            if (data.type === 'avatar') {
+                if (data.image && data.image.length > 100) {
+                    avatar.src = data.image;
+                    console.log('✅ Avatar updated');
+                }
+                
+                if (data.status) {
+                    document.getElementById('status').textContent = '🤖 Ready to chat!';
+                }
+            }
+            
+            if (data.type === 'response') {
+                addMessage(data.text, 'assistant');
+                
+                // Speak the response with perfect browser audio
+                if (sarahAudio && data.text) {
+                    sarahAudio.speak(data.text);
+                }
+            }
+            
+            if (data.type === 'error') {
+                const errorMsg = `❌ ${data.message}`;
+                document.getElementById('status').textContent = errorMsg;
+                addMessage(errorMsg, 'assistant');
+                
+                if (sarahAudio) {
+                    sarahAudio.speak(`Error: ${data.message}`);
+                }
+            }
+        }
+
+        function addMessage(text, sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage(text) {
+            if (!ws || !text.trim()) return;
+            
+            addMessage(text, 'user');
+            document.getElementById('status').innerHTML = '<span class="loading"></span>&nbsp;&nbsp;Processing...';
+            
+            ws.send(JSON.stringify({
+                type: 'text',
+                text: text.trim()
+            }));
+            
+            document.getElementById('textInput').value = '';
+        }
+
+        // Event listeners
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const textInput = document.getElementById('textInput');
+            sendMessage(textInput.value);
+        });
+
+        document.getElementById('textInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage(e.target.value);
+            }
+        });
+
+        // Microphone events
+        const micButton = document.getElementById('micButton');
+        
+        micButton.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            if (sarahAudio) {
+                sarahAudio.startListening();
+            }
+        });
+        
+        micButton.addEventListener('mouseup', (e) => {
+            e.preventDefault();
+            if (sarahAudio) {
+                sarahAudio.stopListening();
+            }
+        });
+        
+        micButton.addEventListener('mouseleave', () => {
+            if (sarahAudio) {
+                sarahAudio.stopListening();
+            }
+        });
+        
+        micButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (sarahAudio) {
+                sarahAudio.startListening();
+            }
+        });
+        
+        micButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (sarahAudio) {
+                sarahAudio.stopListening();
+            }
+        });
+
+        // Global function for WebSocket
+        window.sendMessage = sendMessage;
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize audio system
+            sarahAudio = new SarahAudioSystem();
+            
+            // Initialize WebSocket
+            initWebSocket();
+            
+            // Start with idle animation
+            document.getElementById('avatarContainer').classList.add('idle');
+            
+            console.log('🚀 Sarah AI system initialized');
+        });
+    </script>
+</body>
+</html>
